@@ -5,10 +5,11 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CacheService } from 'src/infrastructure/redis/cache.service';
-import { UpdateUserDto } from './dto/user.dto';
+import { UserDto } from './dto/user.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 const CACHE_TTL = 60;
+
 const key = {
   one: (id: string) => `cache:users:${id}`,
   list: (cursor: string, limit: number) =>
@@ -22,7 +23,6 @@ export class UsersService {
     private readonly cache: CacheService,
   ) {}
 
-  // ─── GET /users ───────────────────────────────────────────────
   async findAll(pagination: PaginationDto) {
     const { limit = 10, cursor } = pagination;
     const cacheKey = key.list(cursor ?? 'start', limit);
@@ -31,7 +31,7 @@ export class UsersService {
     if (cached) return cached;
 
     const users = await this.prisma.user.findMany({
-      take: limit + 1, // fetch one extra to determine if there's a next page
+      take: limit + 1,
       ...(cursor && {
         skip: 1,
         cursor: { id: cursor },
@@ -60,7 +60,6 @@ export class UsersService {
     return result;
   }
 
-  // ─── GET /users/:id ───────────────────────────────────────────
   async findOne(id: string) {
     const cacheKey = key.one(id);
 
@@ -86,9 +85,7 @@ export class UsersService {
     return user;
   }
 
-  // ─── PUT /users/:id ───────────────────────────────────────────
-  async update(id: string, requesterId: string, dto: UpdateUserDto) {
-    // Users can only update their own profile
+  async update(id: string, requesterId: string, dto: UserDto) {
     if (id !== requesterId)
       throw new ForbiddenException('Cannot update another user');
 
@@ -108,7 +105,6 @@ export class UsersService {
       },
     });
 
-    // Invalidate both single and list caches
     await this.cache.del(key.one(id));
     await this.cache.delByPattern('cache:users:list:*');
 

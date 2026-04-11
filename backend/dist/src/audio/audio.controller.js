@@ -63,7 +63,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, audio_dto_1.UpdateAudioDto, Object]),
+    __metadata("design:paramtypes", [String, audio_dto_1.AudioDto, Object]),
     __metadata("design:returntype", void 0)
 ], AudioController.prototype, "update", null);
 exports.AudioController = AudioController = __decorate([

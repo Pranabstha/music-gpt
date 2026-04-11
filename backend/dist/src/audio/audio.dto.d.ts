@@ -1,3 +1,3 @@
-export declare class UpdateAudioDto {
+export declare class AudioDto {
     title?: string;
 }

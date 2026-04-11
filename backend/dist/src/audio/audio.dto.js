@@ -9,18 +9,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateAudioDto = void 0;
+exports.AudioDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-class UpdateAudioDto {
+class AudioDto {
     title;
 }
-exports.UpdateAudioDto = UpdateAudioDto;
+exports.AudioDto = AudioDto;
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: 'My Cool Track' }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
-], UpdateAudioDto.prototype, "title", void 0);
+], AudioDto.prototype, "title", void 0);
 //# sourceMappingURL=audio.dto.js.map

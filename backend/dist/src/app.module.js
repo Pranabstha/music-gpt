@@ -17,6 +17,8 @@ const redis_module_1 = require("./infrastructure/redis/redis.module");
 const RateLimitGuard_1 = require("./common/RateLimitGuard");
 const user_module_1 = require("./user/user.module");
 const audio_module_1 = require("./audio/audio.module");
+const prompt_module_1 = require("./prompt/prompt.module");
+const jwt_auth_guard_1 = require("./auth/guards/jwt-auth.guard");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -30,13 +32,19 @@ exports.AppModule = AppModule = __decorate([
             subscription_module_1.SubscriptionModule,
             user_module_1.UsersModule,
             audio_module_1.AudioModule,
+            prompt_module_1.PromptsModule,
         ],
         providers: [
+            {
+                provide: core_1.APP_GUARD,
+                useClass: jwt_auth_guard_1.JwtAuthGuard,
+            },
             {
                 provide: core_1.APP_GUARD,
                 useFactory: (guard) => guard,
                 inject: [RateLimitGuard_1.RateLimitGuard],
             },
+            RateLimitGuard_1.RateLimitGuard,
         ],
     })
 ], AppModule);

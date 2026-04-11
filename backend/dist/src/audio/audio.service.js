@@ -40,7 +40,6 @@ let AudioService = class AudioService {
             orderBy: { createdAt: 'desc' },
             select: {
                 id: true,
-                title: true,
                 url: true,
                 userId: true,
                 promptId: true,
@@ -66,7 +65,6 @@ let AudioService = class AudioService {
             where: { id },
             select: {
                 id: true,
-                title: true,
                 url: true,
                 userId: true,
                 promptId: true,

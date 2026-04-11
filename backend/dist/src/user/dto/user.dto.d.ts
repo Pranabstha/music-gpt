@@ -1,4 +1,4 @@
-export declare class UpdateUserDto {
+export declare class UserDto {
     display_name?: string;
     name?: string;
 }

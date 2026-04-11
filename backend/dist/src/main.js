@@ -11,6 +11,9 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
         transform: true,
     }));
+    app.enableCors({
+        origin: process.env.CLIENT_URL ?? '*',
+    });
     const config = new swagger_1.DocumentBuilder()
         .setTitle('Music GPT API')
         .setDescription('API documentation')

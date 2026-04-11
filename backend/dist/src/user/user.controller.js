@@ -63,7 +63,7 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, user_dto_1.UpdateUserDto, Object]),
+    __metadata("design:paramtypes", [String, user_dto_1.UserDto, Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "update", null);
 exports.UsersController = UsersController = __decorate([

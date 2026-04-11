@@ -14,6 +14,10 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: process.env.CLIENT_URL ?? '*',
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Music GPT API')
     .setDescription('API documentation')

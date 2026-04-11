@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CacheService } from 'src/infrastructure/redis/cache.service';
-import { UpdateAudioDto } from './audio.dto';
+import { AudioDto } from './audio.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 const CACHE_TTL = 60;
@@ -22,7 +22,6 @@ export class AudioService {
     private readonly cache: CacheService,
   ) {}
 
-  // ─── GET /audio ───────────────────────────────────────────────
   async findAll(pagination: PaginationDto) {
     const { limit = 10, cursor } = pagination;
     const cacheKey = key.list(cursor ?? 'start', limit);
@@ -39,7 +38,8 @@ export class AudioService {
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
-        title: true,
+        // title: true,
+
         url: true,
         userId: true,
         promptId: true,
@@ -60,7 +60,6 @@ export class AudioService {
     return result;
   }
 
-  // ─── GET /audio/:id ───────────────────────────────────────────
   async findOne(id: string) {
     const cacheKey = key.one(id);
 
@@ -71,7 +70,7 @@ export class AudioService {
       where: { id },
       select: {
         id: true,
-        title: true,
+        // title: true,
         url: true,
         userId: true,
         promptId: true,
@@ -89,12 +88,10 @@ export class AudioService {
     return audio;
   }
 
-  // ─── PUT /audio/:id ───────────────────────────────────────────
-  async update(id: string, requesterId: string, dto: UpdateAudioDto) {
+  async update(id: string, requesterId: string, dto: AudioDto) {
     const audio = await this.prisma.audio.findUnique({ where: { id } });
     if (!audio) throw new NotFoundException('Audio not found');
 
-    // Users can only update their own audio
     if (audio.userId !== requesterId) {
       throw new ForbiddenException('Cannot update audio you do not own');
     }
@@ -111,7 +108,6 @@ export class AudioService {
       },
     });
 
-    // Invalidate caches
     await this.cache.del(key.one(id));
     await this.cache.delByPattern('cache:audio:list:*');
 

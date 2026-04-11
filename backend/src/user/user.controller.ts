@@ -15,7 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UsersService } from './user.service';
-import { UpdateUserDto } from './dto/user.dto';
+import { UserDto } from './dto/user.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
@@ -45,7 +45,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Update user (invalidates cache)' })
   @ApiResponse({ status: 200, description: 'Updated user' })
   @ApiResponse({ status: 403, description: 'Cannot update another user' })
-  update(@Param('id') id: string, @Body() dto: UpdateUserDto, @Request() req) {
+  update(@Param('id') id: string, @Body() dto: UserDto, @Request() req) {
     return this.usersService.update(id, req.user.id, dto);
   }
 }

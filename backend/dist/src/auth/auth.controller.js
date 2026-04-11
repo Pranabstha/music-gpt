@@ -20,6 +20,7 @@ const login_dto_1 = require("./dto/login.dto");
 const jwt_refresh_guard_1 = require("./guards/jwt-refresh.guard");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 const swagger_1 = require("@nestjs/swagger");
+const public_dectors_1 = require("../common/decorators/public.dectors");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -33,7 +34,6 @@ let AuthController = class AuthController {
     }
     refresh(req) {
         const user = req.user;
-        console.log('calling');
         return this.authService.refresh(user.id, user.email);
     }
     logout(req) {
@@ -43,6 +43,7 @@ let AuthController = class AuthController {
 };
 exports.AuthController = AuthController;
 __decorate([
+    (0, public_dectors_1.Public)(),
     (0, common_1.Post)('register'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -50,6 +51,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "register", null);
 __decorate([
+    (0, public_dectors_1.Public)(),
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(200),
     __param(0, (0, common_1.Body)()),

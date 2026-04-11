@@ -13,16 +13,19 @@ import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import type { Request } from 'express';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { Public } from '../common/decorators/public.dectors';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Public()
   @Post('register')
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
+  @Public()
   @Post('login')
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
@@ -35,8 +38,6 @@ export class AuthController {
   @HttpCode(200)
   refresh(@Req() req: Request) {
     const user = req.user as any;
-
-    console.log('calling');
     return this.authService.refresh(user.id, user.email);
   }
 

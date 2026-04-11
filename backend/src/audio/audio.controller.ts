@@ -15,7 +15,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AudioService } from './audio.service';
-import { UpdateAudioDto } from './audio.dto';
+import { AudioDto } from './audio.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
@@ -45,7 +45,7 @@ export class AudioController {
     status: 403,
     description: 'Cannot update audio you do not own',
   })
-  update(@Param('id') id: string, @Body() dto: UpdateAudioDto, @Request() req) {
+  update(@Param('id') id: string, @Body() dto: AudioDto, @Request() req) {
     return this.audioService.update(id, req.user.id, dto);
   }
 }
