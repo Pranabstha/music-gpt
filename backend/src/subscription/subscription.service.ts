@@ -15,7 +15,7 @@ export class SubscriptionService {
       select: {
         id: true,
         email: true,
-        display_name: true,
+        name: true,
         subscription_status: true,
       },
     });
@@ -30,7 +30,7 @@ export class SubscriptionService {
       select: {
         id: true,
         email: true,
-        display_name: true,
+        name: true,
         subscription_status: true,
       },
     });
@@ -46,7 +46,7 @@ export class SubscriptionService {
       select: {
         id: true,
         email: true,
-        display_name: true,
+        name: true,
         subscription_status: true,
       },
     });

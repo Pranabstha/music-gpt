@@ -4,20 +4,20 @@ export declare class SubscriptionService {
     constructor(prisma: PrismaService);
     subscribe(userId: string): Promise<{
         email: string;
+        name: string | null;
         id: string;
-        display_name: string | null;
         subscription_status: import("@prisma/client").$Enums.SubscriptionStatus;
     }>;
     cancel(userId: string): Promise<{
         email: string;
+        name: string | null;
         id: string;
-        display_name: string | null;
         subscription_status: import("@prisma/client").$Enums.SubscriptionStatus;
     }>;
     getStatus(userId: string): Promise<{
         email: string;
+        name: string | null;
         id: string;
-        display_name: string | null;
         subscription_status: import("@prisma/client").$Enums.SubscriptionStatus;
     }>;
     private findUserOrFail;

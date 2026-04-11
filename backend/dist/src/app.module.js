@@ -14,26 +14,29 @@ const prisma_module_1 = require("./prisma/prisma.module");
 const auth_module_1 = require("./auth/auth.module");
 const subscription_module_1 = require("./subscription/subscription.module");
 const redis_module_1 = require("./infrastructure/redis/redis.module");
-const jwt_auth_guard_1 = require("./auth/guards/jwt-auth.guard");
-const rate_limi_middleware_1 = require("./common/rate-limi.middleware");
+const RateLimitGuard_1 = require("./common/RateLimitGuard");
+const user_module_1 = require("./user/user.module");
+const audio_module_1 = require("./audio/audio.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            config_1.ConfigModule.forRoot({
-                isGlobal: true,
-                envFilePath: '.env',
-            }),
+            config_1.ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
             redis_module_1.RedisModule,
             prisma_module_1.PrismaModule,
             auth_module_1.AuthModule,
             subscription_module_1.SubscriptionModule,
+            user_module_1.UsersModule,
+            audio_module_1.AudioModule,
         ],
         providers: [
-            { provide: core_1.APP_GUARD, useClass: jwt_auth_guard_1.JwtAuthGuard },
-            { provide: core_1.APP_GUARD, useClass: rate_limi_middleware_1.RateLimitGuard },
+            {
+                provide: core_1.APP_GUARD,
+                useFactory: (guard) => guard,
+                inject: [RateLimitGuard_1.RateLimitGuard],
+            },
         ],
     })
 ], AppModule);

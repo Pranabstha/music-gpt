@@ -8,23 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RateLimitGuard = void 0;
 const common_1 = require("@nestjs/common");
-const ioredis_1 = require("ioredis");
-const redis_module_1 = require("../infrastructure/redis/redis.module");
-const LIMITS = {
-    FREE: 20,
-    PAID: 100,
-};
+const cache_service_1 = require("../infrastructure/redis/cache.service");
+const LIMITS = { FREE: 20, PAID: 100 };
 const WINDOW_SECONDS = 60;
 let RateLimitGuard = class RateLimitGuard {
-    redis;
-    constructor(redis) {
-        this.redis = redis;
+    cacheService;
+    constructor(cacheService) {
+        this.cacheService = cacheService;
     }
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
@@ -34,12 +27,11 @@ let RateLimitGuard = class RateLimitGuard {
         const tier = user.subscription_status;
         const limit = LIMITS[tier] ?? LIMITS.FREE;
         const key = `rate:${user.id}`;
-        const current = await this.redis.incr(key);
-        if (current === 1) {
-            await this.redis.expire(key, WINDOW_SECONDS);
-        }
+        const current = await this.cacheService.redis.incr(key);
+        if (current === 1)
+            await this.cacheService.redis.expire(key, WINDOW_SECONDS);
         if (current > limit) {
-            const ttl = await this.redis.ttl(key);
+            const ttl = await this.cacheService.redis.ttl(key);
             throw new common_1.HttpException({
                 statusCode: 429,
                 error: 'Too Many Requests',
@@ -56,7 +48,6 @@ let RateLimitGuard = class RateLimitGuard {
 exports.RateLimitGuard = RateLimitGuard;
 exports.RateLimitGuard = RateLimitGuard = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)(redis_module_1.REDIS_CLIENT)),
-    __metadata("design:paramtypes", [ioredis_1.Redis])
+    __metadata("design:paramtypes", [cache_service_1.CacheService])
 ], RateLimitGuard);
-//# sourceMappingURL=rate-limi.middleware.js.map
+//# sourceMappingURL=RateLimitGuard.js.map
