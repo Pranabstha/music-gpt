@@ -1,0 +1,68 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"] 
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SubscriptionStatus {
+  FREE
+  PAID
+}
+
+enum PromptStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+}
+
+model User {
+  id                  String             @id @default(uuid())
+  email               String             @unique
+  password            String
+  refreshToken        String?
+  name                String?
+  display_name        String?
+  subscription_status SubscriptionStatus @default(FREE)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  prompts Prompt[]
+  audios  Audio[]
+
+  @@map("users")
+}
+
+model Prompt {
+  id        String       @id @default(uuid())
+  text      String
+  status    PromptStatus @default(PENDING)
+  userId    String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  audio Audio?
+
+  @@index([userId])
+  @@index([status])
+  @@map("prompts")
+}
+
+model Audio {
+  id        String   @id @default(uuid())
+  title     String
+  url       String
+  userId    String
+  promptId  String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("audios")
+}
