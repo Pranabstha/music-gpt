@@ -43,26 +43,6 @@ services:
       - '8080:3000'
     env_file:
       - .env  
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/music_gpt
-      REDIS_URL: redis://redis:6379
-      # JWT_SECRET: EgikWXIqmVLLWCz1aNckt8RJOrEvE6BjE2J9UHBFuuYwHGiDWIQrG0Ji+wBjYr0M8ENzj9Xc++EobN26UW/EWA==
-      # JWT_REFRESH_SECRET: mw25nmvD7bmEd+wNOaw1YAORbANXy0w7YHcXYBfkESpbKk3EM/0Q+j3fG/HRrFDonAbD1E+TBMGnYj3fkjFWYA==
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
-  worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    container_name: music_gpt_worker
-    restart: always
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/music_gpt
-      REDIS_URL: redis://redis:6379
     depends_on:
       postgres:
         condition: service_healthy

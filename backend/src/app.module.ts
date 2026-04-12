@@ -13,6 +13,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { EventsModule } from './gateway/event.module';
 import { PromptModule } from './prompt/prompt.module';
 import { ReqMiddleware } from './common/req.middleware';
+import { WorkersModule } from './workers/worker.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ReqMiddleware } from './common/req.middleware';
     AudioModule,
     PromptModule,
     EventsModule,
+    WorkersModule,
   ],
   providers: [
     {

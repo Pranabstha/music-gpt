@@ -21,7 +21,17 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     Array<{ event: string; payload: unknown }>
   >();
 
+  private static instance = 0;
+
+  constructor() {
+    EventsGateway.instance++;
+    console.log(`EventsGateway instance #${EventsGateway.instance} created`);
+  }
+
   handleConnection(client: Socket) {
+    console.log(
+      `🟢 handleConnection fired, map size before: ${this.userSocketMap.size}`,
+    );
     const userId = client.handshake.query.userId as string;
 
     if (!userId) {
@@ -32,6 +42,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!this.userSocketMap.has(userId)) {
       this.userSocketMap.set(userId, new Set());
     }
+
+    console.log(`🟢 after adding, map size: ${this.userSocketMap.size}`);
+    console.log(`🟢 map keys: ${[...this.userSocketMap.keys()].join(', ')}`);
+    client.emit('connected.ack', { message: 'socket registered', userId });
 
     this.userSocketMap.get(userId).add(client.id);
     this.logger.log(`User ${userId} connected → socket ${client.id}`);
@@ -62,13 +76,13 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   emitToUser(userId: string, event: string, payload: unknown) {
     const sockets = this.userSocketMap.get(userId);
-
     if (!sockets || sockets.size === 0) {
       this.logger.warn(`No active sockets for user ${userId}`);
       return;
     }
 
     for (const socketId of sockets) {
+      this.logger.debug(`Emitting ${event} to socket ${socketId}`);
       this.server.to(socketId).emit(event, payload);
     }
   }
