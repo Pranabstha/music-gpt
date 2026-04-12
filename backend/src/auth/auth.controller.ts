@@ -32,8 +32,8 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @Public()
   @Post('refresh')
-  @ApiBearerAuth()
   @UseGuards(JwtRefreshGuard)
   @HttpCode(200)
   refresh(@Req() req: Request) {
@@ -42,8 +42,6 @@ export class AuthController {
   }
 
   @Post('logout')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   logout(@Req() req: Request) {
     const user = req.user as any;

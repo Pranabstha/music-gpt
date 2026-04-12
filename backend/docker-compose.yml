@@ -33,11 +33,11 @@ services:
       timeout: 5s
       retries: 5
 
-  api:
+  music_gpt_backend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: music_gpt_api
+    container_name: music_gpt_backend
     restart: always
     ports:
       - '8080:3000'
