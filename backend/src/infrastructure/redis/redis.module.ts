@@ -19,10 +19,8 @@ import { CacheService } from './cache.service';
             return Math.min(times * 200, 6000);
           },
         });
-        client.on('connect', () => console.log(`✅ Redis connected → ${url}`));
-        client.on('error', (err) =>
-          console.error('❌ Redis error:', err.message),
-        );
+        client.on('connect', () => console.log(`Redis connected → ${url}`));
+        client.on('error', (err) => console.error('Redis error:', err.message));
         return client;
       },
     },

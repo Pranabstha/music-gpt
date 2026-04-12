@@ -33,7 +33,6 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
     if (!user || !user.refreshToken) throw new UnauthorizedException();
 
-    // Compare hashed token stored in DB
     const isMatch = await bcrypt.compare(rawToken, user.refreshToken);
     if (!isMatch) throw new UnauthorizedException('Refresh token invalid');
 

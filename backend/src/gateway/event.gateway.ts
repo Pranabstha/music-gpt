@@ -29,9 +29,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleConnection(client: Socket) {
-    console.log(
-      `🟢 handleConnection fired, map size before: ${this.userSocketMap.size}`,
-    );
     const userId = client.handshake.query.userId as string;
 
     if (!userId) {
@@ -43,8 +40,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.userSocketMap.set(userId, new Set());
     }
 
-    console.log(`🟢 after adding, map size: ${this.userSocketMap.size}`);
-    console.log(`🟢 map keys: ${[...this.userSocketMap.keys()].join(', ')}`);
     client.emit('connected.ack', { message: 'socket registered', userId });
 
     this.userSocketMap.get(userId).add(client.id);
