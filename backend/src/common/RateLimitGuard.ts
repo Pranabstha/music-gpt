@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { SubscriptionStatus } from '@prisma/client';
 import { CacheService } from 'src/infrastructure/redis/cache.service';
 
 const LIMITS = { FREE: 20, PAID: 100 };
@@ -20,7 +21,7 @@ export class RateLimitGuard implements CanActivate {
 
     if (!user) return true;
 
-    const tier = user.subscription_status as 'FREE' | 'PAID';
+    const tier = user.subscription_status as SubscriptionStatus;
     const limit = LIMITS[tier] ?? LIMITS.FREE;
     const key = `rate:${user.id}`;
 

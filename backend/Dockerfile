@@ -1,15 +1,18 @@
 FROM node:20-alpine
 
+RUN apk add --no-cache libc6-compat openssl
+
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+COPY prisma ./prisma/
 
-COPY prisma ./prisma
+RUN npm ci
+
 RUN npx prisma generate
 
 COPY . .
-RUN npm run build
 
 EXPOSE 3000
-CMD ["node", "dist/main"]
+
+CMD ["sh", "-c", "npm run build && npx prisma migrate deploy && node dist/main.js"]

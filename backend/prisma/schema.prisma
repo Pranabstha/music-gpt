@@ -16,6 +16,7 @@ enum PromptStatus {
   PENDING
   PROCESSING
   COMPLETED
+  FAILED
 }
 
 model User {

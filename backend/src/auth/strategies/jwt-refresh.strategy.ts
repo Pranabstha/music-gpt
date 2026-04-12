@@ -24,6 +24,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
   }
 
   async validate(req: Request, payload: { sub: string; email: string }) {
+    console.log('calling hasdhaskjdhkaj');
     const rawToken = req.get('Authorization')?.replace('Bearer ', '').trim();
     if (!rawToken) throw new UnauthorizedException();
 

@@ -1,7 +1,8 @@
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { Processor, WorkerHost, OnWorkerEvent } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PromptStatus } from '@prisma/client';
 import { EventsGateway } from 'src/gateway/event.gateway';
 
 export const PROMPT_QUEUE = 'prompt-queue';
@@ -29,7 +30,13 @@ export class PromptProcessor extends WorkerHost {
 
     await this.prisma.prompt.update({
       where: { id: promptId },
-      data: { status: 'PROCESSING' },
+      data: { status: PromptStatus.PROCESSING },
+    });
+
+    Logger.debug('emitting to user Processng');
+    this.eventsGateway.emitToUser(userId, 'prompt.processing', {
+      promptId,
+      status: PromptStatus.PROCESSING,
     });
 
     const delay = 3000 + Math.random() * 2000;
@@ -44,15 +51,16 @@ export class PromptProcessor extends WorkerHost {
       const audio = await this.prisma.audio.create({
         data: {
           title: prompt.text.slice(0, 80),
-          url: `https://cdn.example.com/audio/${promptId}.mp3`,
+          url: `https://music-gpt.com/audio/${promptId}.mp3`,
           userId,
           promptId,
         },
       });
 
+      Logger.debug('emitting to user Processng');
       await this.prisma.prompt.update({
         where: { id: promptId },
-        data: { status: 'COMPLETED' },
+        data: { status: PromptStatus.COMPLETED },
       });
 
       this.eventsGateway.emitToUser(userId, 'prompt.completed', {
@@ -67,5 +75,22 @@ export class PromptProcessor extends WorkerHost {
     }
 
     this.logger.log(`Prompt ${promptId} completed → notified user ${userId}`);
+  }
+
+  @OnWorkerEvent('failed')
+  async onFailed(job: Job<PromptJobData>, error: Error) {
+    const { promptId, userId } = job.data;
+    this.logger.error(`Prompt ${promptId} failed: ${error.message}`);
+
+    await this.prisma.prompt.update({
+      where: { id: promptId },
+      data: { status: PromptStatus.FAILED },
+    });
+
+    this.eventsGateway.emitToUser(userId, 'prompt.failed', {
+      promptId,
+      status: 'FAILED',
+      error: error.message,
+    });
   }
 }

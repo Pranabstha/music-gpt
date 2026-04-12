@@ -4,6 +4,9 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { PrismaService } from '../prisma/prisma.service';
 import { PromptJobData, PROMPT_QUEUE } from '../workers/prompt.processor';
+import { PromptStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@prisma/client';
+import { EventsGateway } from 'src/gateway/event.gateway';
 
 @Injectable()
 export class PromptScheduler {
@@ -17,7 +20,7 @@ export class PromptScheduler {
   @Cron(CronExpression.EVERY_10_SECONDS)
   async enqueuePendingPrompts() {
     const pendingPrompts = await this.prisma.prompt.findMany({
-      where: { status: 'PENDING' },
+      where: { status: PromptStatus.PENDING },
       include: { user: true },
     });
 
@@ -26,7 +29,13 @@ export class PromptScheduler {
     this.logger.log(`Enqueueing ${pendingPrompts.length} pending prompt(s)`);
 
     for (const prompt of pendingPrompts) {
-      const isPaid = prompt.user.subscription_status === 'PAID';
+      const isPaid =
+        prompt.user.subscription_status === SubscriptionStatus.PAID;
+
+      await this.prisma.prompt.update({
+        where: { id: prompt.id },
+        data: { status: PromptStatus.PROCESSING },
+      });
 
       const jobData: PromptJobData = {
         promptId: prompt.id,
