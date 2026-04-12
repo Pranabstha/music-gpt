@@ -14,6 +14,7 @@ import { EventsModule } from './gateway/event.module';
 import { PromptModule } from './prompt/prompt.module';
 import { ReqMiddleware } from './common/req.middleware';
 import { WorkersModule } from './workers/worker.module';
+import { SearchModule } from './search/search.service';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { WorkersModule } from './workers/worker.module';
     PromptModule,
     EventsModule,
     WorkersModule,
+    SearchModule,
   ],
   providers: [
     {
