@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -28,23 +30,27 @@ export class AudioController {
 
   @Get()
   @ApiOperation({ summary: 'Get all audio (paginated + cached)' })
+  @ApiOkResponse({ description: 'Audio list fetched successfully.' })
   findAll(@Query() pagination: PaginationDto) {
     return this.audioService.findAll(pagination);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get audio by ID (cached)' })
-  @ApiResponse({ status: 404, description: 'Audio not found' })
+  @ApiOkResponse({ description: 'Audio fetched successfully.' })
+  @ApiResponse({ status: 404, description: 'Audio not found.' })
   findOne(@Param('id') id: string) {
     return this.audioService.findOne(id);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update audio title (invalidates cache)' })
+  @ApiOkResponse({ description: 'Audio updated successfully.' })
   @ApiResponse({
     status: 403,
-    description: 'Cannot update audio you do not own',
+    description: 'You are not allowed to update this audio.',
   })
+  @ApiResponse({ status: 404, description: 'Audio not found.' })
   update(@Param('id') id: string, @Body() dto: AudioDto, @Request() req) {
     return this.audioService.update(id, req.user.id, dto);
   }

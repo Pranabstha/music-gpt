@@ -11,11 +11,6 @@ export class PromptsController {
   @Post()
   async create(@Body() dto: PromptDto, @Request() req) {
     const prompt = await this.promptsService.create(dto, req.user.id);
-    return {
-      id: prompt.id,
-      status: prompt.status,
-      message:
-        'Prompt received. You will be notified via WebSocket when ready.',
-    };
+    return prompt;
   }
 }

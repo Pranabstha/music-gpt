@@ -6,7 +6,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { PromptJobData, PROMPT_QUEUE } from '../workers/prompt.processor';
 import { PromptStatus } from '@prisma/client';
 import { SubscriptionStatus } from '@prisma/client';
-import { EventsGateway } from 'src/gateway/event.gateway';
 
 @Injectable()
 export class PromptScheduler {

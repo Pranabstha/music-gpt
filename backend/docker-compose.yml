@@ -40,7 +40,7 @@ services:
     container_name: music_gpt_backend
     restart: always
     ports:
-      - '8080:3000'
+      - '8080:8080'
     env_file:
       - .env  
     depends_on:

@@ -33,7 +33,6 @@ export class PromptProcessor extends WorkerHost {
       data: { status: PromptStatus.PROCESSING },
     });
 
-    Logger.debug('emitting to user Processng');
     this.eventsGateway.emitToUser(userId, 'prompt.processing', {
       promptId,
       status: PromptStatus.PROCESSING,
@@ -57,7 +56,6 @@ export class PromptProcessor extends WorkerHost {
         },
       });
 
-      Logger.debug('emitting to user Processng');
       await this.prisma.prompt.update({
         where: { id: promptId },
         data: { status: PromptStatus.COMPLETED },
@@ -65,7 +63,7 @@ export class PromptProcessor extends WorkerHost {
 
       this.eventsGateway.emitToUser(userId, 'prompt.completed', {
         promptId,
-        status: 'COMPLETED',
+        status: PromptStatus.COMPLETED,
         audio: {
           id: audio.id,
           title: audio.title,
@@ -89,7 +87,7 @@ export class PromptProcessor extends WorkerHost {
 
     this.eventsGateway.emitToUser(userId, 'prompt.failed', {
       promptId,
-      status: 'FAILED',
+      status: PromptStatus.FAILED,
       error: error.message,
     });
   }
