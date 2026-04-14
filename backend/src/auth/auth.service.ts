@@ -30,12 +30,18 @@ export class AuthService {
       const hashedPassword = await bcrypt.hash(dto.password, 10);
 
       const user = await this.prisma.user.create({
-        data: { email: dto.email, password: hashedPassword, name: dto.name },
+        data: {
+          email: dto.email,
+          password: hashedPassword,
+          name: dto.name,
+          display_name: dto.display_name,
+        },
       });
 
       const tokens = await this.generateTokens(user.id, user.email);
       await this.saveRefreshToken(user.id, tokens.refreshToken);
-      return user;
+      const { password, ...rest } = user;
+      return rest;
     } catch (error) {
       Logger.error(error);
       throw new InternalServerErrorException(error);
