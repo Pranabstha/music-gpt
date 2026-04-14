@@ -6,6 +6,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Injectable, Logger } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' } })
@@ -23,15 +24,31 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private static instance = 0;
 
-  constructor() {
+  constructor(private readonly jwtService: JwtService) {
     EventsGateway.instance++;
     console.log(`EventsGateway instance #${EventsGateway.instance} created`);
   }
 
   handleConnection(client: Socket) {
-    const userId = client.handshake.query.userId as string;
+    const token = client.handshake.query.token as string;
 
-    if (!userId) {
+    if (!token) {
+      this.logger.warn(
+        `Connection rejected — no token provided (${client.id})`,
+      );
+      client.disconnect();
+      return;
+    }
+
+    let userId: string;
+
+    try {
+      const payload = this.jwtService.verify(token);
+      userId = payload.sub;
+    } catch {
+      this.logger.warn(
+        `Connection rejected — invalid or expired token (${client.id})`,
+      );
       client.disconnect();
       return;
     }
@@ -40,10 +57,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.userSocketMap.set(userId, new Set());
     }
 
-    client.emit('connected.ack', { message: 'socket registered', userId });
+    client.data.userId = userId;
 
     this.userSocketMap.get(userId).add(client.id);
     this.logger.log(`User ${userId} connected → socket ${client.id}`);
+
+    client.emit('connected.ack', { message: 'socket registered', userId });
 
     const pending = this.pendingEvents.get(userId);
     if (pending?.length) {
@@ -55,29 +74,35 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    for (const [userId, sockets] of this.userSocketMap.entries()) {
-      if (sockets.has(client.id)) {
-        sockets.delete(client.id);
+    const userId = client.data?.userId;
 
+    if (userId) {
+      const sockets = this.userSocketMap.get(userId);
+      if (sockets) {
+        sockets.delete(client.id);
         if (sockets.size === 0) {
           this.userSocketMap.delete(userId);
         }
-
-        this.logger.log(`User ${userId} disconnected`);
-        break;
       }
+      this.logger.log(`User ${userId} disconnected → socket ${client.id}`);
     }
   }
 
   emitToUser(userId: string, event: string, payload: unknown) {
     const sockets = this.userSocketMap.get(userId);
+
     if (!sockets || sockets.size === 0) {
-      this.logger.warn(`No active sockets for user ${userId}`);
+      this.logger.warn(`User ${userId} is offline — queuing event "${event}"`);
+
+      if (!this.pendingEvents.has(userId)) {
+        this.pendingEvents.set(userId, []);
+      }
+      this.pendingEvents.get(userId).push({ event, payload });
       return;
     }
 
     for (const socketId of sockets) {
-      this.logger.debug(`Emitting ${event} to socket ${socketId}`);
+      this.logger.debug(`Emitting "${event}" to socket ${socketId}`);
       this.server.to(socketId).emit(event, payload);
     }
   }
