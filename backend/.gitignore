@@ -51,4 +51,4 @@ pids/
 *.pid
 tmp/
 temp/
-.cache/
+.cache/dist/
