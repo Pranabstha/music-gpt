@@ -1,9 +1,15 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { SearchService } from './serach.module';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Search')
 @Controller('search')
+@ApiBearerAuth()
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
